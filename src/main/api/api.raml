@@ -1,0 +1,86 @@
+#%RAML 0.8
+title: PSD2 BMB API
+version: 1.0
+baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
+
+/account/{productIdentifier}:
+  description:
+    Retrieve account information from account sort code or credit card number. 
+  uriParameters:
+    productIdentifier:
+      description: Sort code and account number, or credit card number (in the future this could be a psd2 product id token rather than the actual product number).
+      type: string
+  get:
+    responses:
+      200:
+        body:  
+          application/json:
+            example: |
+              {
+                "productName": "HSBC Savings Account",
+                "balance": "8374.00"
+              }
+  /timeline:
+    description:
+      Retrieve timeline events (transactions, future transactions, adverts, recommendations and renewals) for the given product.
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                [
+                  {
+                    "datetime": "2016-07-12 12:34",
+                    "description": "Costa coffe",
+                    "type": "transaction",
+                    "data": 
+                    {
+
+                      "paymentMethod": "Debit transaction",
+                      "reference": "DHETYENKF",
+                      "accountNumber": "87623476",
+                      "amount": "2.20"
+                    }
+                  },
+                  {
+                    "datetime": "2016-07-31 00:00",
+                    "description": "Mortage",
+                    "type": "futureTransaction",
+                    "data": 
+                    {
+                      "paymentMethod": "Regular transaction",
+                      "transactionType": "Standing order",
+                      "reference": "DHETYENKF",
+                      "accountNumber": "87623476",
+                      "amount": "900.00"
+                    }
+                  },
+                  {
+                    "datetime": "2016-07-14 12:34",
+                    "description": "Personal Loan",
+                    "type": "advert",
+                    "data": 
+                    {
+                      "link": "#loans/start"
+                    }
+                  },
+                  {
+                    "datetime": "2016-07-14 12:34",
+                    "description": "Get travel insurance",
+                    "type": "recommendation",
+                    "data": 
+                    {
+                      "link": "#insurance/start"
+                    }
+                  },
+                  {
+                    "datetime": "2017-01-01 12:00",
+                    "description": "Home insurance renew",
+                    "type": "renewal",
+                    "data": 
+                    {
+                      "link": "#insurance/dashboard"
+                    }
+                  }
+                ]

@@ -20,9 +20,12 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
                 "productName": "HSBC Savings Account",
                 "balance": "8374.00"
               }
-  /timeline:
+/timeline/{type}:
     description:
       Retrieve timeline events (transactions, future transactions, adverts, recommendations and renewals) for the given product.
+    uriParameters:
+      type:
+        enum: [short, full]
     get:
       responses:
         200:
@@ -31,12 +34,12 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
               example: |
                 [
                   {
+                    "section": "today"
                     "datetime": "2016-07-12 12:34",
                     "description": "Costa coffe",
                     "type": "transaction",
                     "data": 
                     {
-
                       "paymentMethod": "Debit transaction",
                       "reference": "DHETYENKF",
                       "accountNumber": "87623476",
@@ -44,6 +47,7 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
                     }
                   },
                   {
+                    "section": "future"
                     "datetime": "2016-07-31 00:00",
                     "description": "Mortage",
                     "type": "futureTransaction",
@@ -57,6 +61,7 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
                     }
                   },
                   {
+                    "section": "thisweek"
                     "datetime": "2016-07-14 12:34",
                     "description": "Personal Loan",
                     "type": "advert",
@@ -66,6 +71,7 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
                     }
                   },
                   {
+                    "section": "thisweek"
                     "datetime": "2016-07-14 12:34",
                     "description": "Get travel insurance",
                     "type": "recommendation",
@@ -75,6 +81,7 @@ baseUri: http://digitalbanking-psd2subgroup-buk.cloudhub.io/api
                     }
                   },
                   {
+                    "section": "thisweek"
                     "datetime": "2017-01-01 12:00",
                     "description": "Home insurance renew",
                     "type": "renewal",

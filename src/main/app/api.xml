@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:api-platform-gw="http://www.mulesoft.org/schema/mule/api-platform-gw" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:api-platform-gw="http://www.mulesoft.org/schema/mule/api-platform-gw" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
-http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/schema/mule/api-platform-gw/current/mule-api-platform-gw.xsd">
-    <http:listener-config name="api-httpListenerConfig" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/schema/mule/api-platform-gw/current/mule-api-platform-gw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
+    <http:listener-config name="api-httpListenerConfig" host="0.0.0.0" port="${http.port}" doc:name="HTTP Listener Configuration"/>
     <apikit:config name="api-config" raml="api.raml" consoleEnabled="false" doc:name="Router"/>
     <api-platform-gw:api apiName="Digital Banking PSD2 subgroup API" version="1.0" flowRef="api-main" create="true" apikitRef="api-config" doc:name="API Autodiscovery"/>
+    <http:request-config name="HTTP_Request_Configuration-hsbc" host="psd2-bank-hsbc.cloudhub.io" port="80" basePath="/api" doc:name="HTTP Request Configuration">
+        <http:raml-api-configuration location="https://anypoint.mulesoft.com/apiplatform/repository/v2/organizations/66d551d4-9ba3-4ac2-8865-56d035c706d1/public/apis/89754/versions/84464/files/root"/>
+    </http:request-config>
+    <http:request-config name="HTTP_Request_Configuration-lloyds" host="psd2-bank-lloyds.cloudhub.io" port="80" basePath="/api" doc:name="HTTP Request Configuration">
+        <http:raml-api-configuration location="https://anypoint.mulesoft.com/apiplatform/repository/v2/organizations/66d551d4-9ba3-4ac2-8865-56d035c706d1/public/apis/89755/versions/84465/files/root"/>
+    </http:request-config>
+    <http:request-config name="HTTP_Request_Configuration-ads" host="psd2-ads.cloudhub.io" port="80" basePath="/api" doc:name="HTTP Request Configuration">
+        <http:raml-api-configuration location="https://anypoint.mulesoft.com/apiplatform/repository/v2/organizations/66d551d4-9ba3-4ac2-8865-56d035c706d1/public/apis/89884/versions/84506/files/root"/>
+    </http:request-config>
     <flow name="api-main">
         <http:listener config-ref="api-httpListenerConfig" path="/api/*" doc:name="HTTP"/>
         <apikit:router config-ref="api-config" doc:name="APIkit Router"/>
@@ -20,9 +32,108 @@ http://www.mulesoft.org/schema/mule/api-platform-gw http://www.mulesoft.org/sche
     <flow name="get:/account/{productIdentifier}:api-config">
         <set-payload value="{&#xA;  &quot;productName&quot;: &quot;HSBC Savings Account&quot;,&#xA;  &quot;balance&quot;: &quot;8374.00&quot;&#xA;}" doc:name="Set Payload"/>
     </flow>
-    <flow name="get:/account/{productIdentifier}/timeline:api-config">
-        <set-payload value="[&#xA;  {&#xA;    &quot;datetime&quot;: &quot;2016-07-12 12:34&quot;,&#xA;    &quot;description&quot;: &quot;Costa coffe&quot;,&#xA;    &quot;type&quot;: &quot;transaction&quot;,&#xA;    &quot;data&quot;: &#xA;    {&#xA;&#xA;      &quot;paymentMethod&quot;: &quot;Debit transaction&quot;,&#xA;      &quot;reference&quot;: &quot;DHETYENKF&quot;,&#xA;      &quot;accountNumber&quot;: &quot;87623476&quot;,&#xA;      &quot;amount&quot;: &quot;2.20&quot;&#xA;    }&#xA;  },&#xA;  {&#xA;    &quot;datetime&quot;: &quot;2016-07-31 00:00&quot;,&#xA;    &quot;description&quot;: &quot;Mortage&quot;,&#xA;    &quot;type&quot;: &quot;futureTransaction&quot;,&#xA;    &quot;data&quot;: &#xA;    {&#xA;      &quot;paymentMethod&quot;: &quot;Regular transaction&quot;,&#xA;      &quot;transactionType&quot;: &quot;Standing order&quot;,&#xA;      &quot;reference&quot;: &quot;DHETYENKF&quot;,&#xA;      &quot;accountNumber&quot;: &quot;87623476&quot;,&#xA;      &quot;amount&quot;: &quot;900.00&quot;&#xA;    }&#xA;  },&#xA;  {&#xA;    &quot;datetime&quot;: &quot;2016-07-14 12:34&quot;,&#xA;    &quot;description&quot;: &quot;Personal Loan&quot;,&#xA;    &quot;type&quot;: &quot;advert&quot;,&#xA;    &quot;data&quot;: &#xA;    {&#xA;      &quot;link&quot;: &quot;#loans/start&quot;&#xA;    }&#xA;  },&#xA;  {&#xA;    &quot;datetime&quot;: &quot;2016-07-14 12:34&quot;,&#xA;    &quot;description&quot;: &quot;Get travel insurance&quot;,&#xA;    &quot;type&quot;: &quot;recommendation&quot;,&#xA;    &quot;data&quot;: &#xA;    {&#xA;      &quot;link&quot;: &quot;#insurance/start&quot;&#xA;    }&#xA;  },&#xA;  {&#xA;    &quot;datetime&quot;: &quot;2017-01-01 12:00&quot;,&#xA;    &quot;description&quot;: &quot;Home insurance renew&quot;,&#xA;    &quot;type&quot;: &quot;renewal&quot;,&#xA;    &quot;data&quot;: &#xA;    {&#xA;      &quot;link&quot;: &quot;#insurance/dashboard&quot;&#xA;    }&#xA;  }&#xA;]" doc:name="Set Payload"/>
+    <flow name="get:/timeline/{type}:api-config">
+        <enricher source="#[payload]" target="#[flowVars.accounts]" doc:name="Message Enricher">
+            <flow-ref name="subflow-getUserAccounts" doc:name="subflow-getUserAccounts"/>
+        </enricher>
+        <set-variable variableName="entries" value="#[new ArrayList()]" doc:name="Initialise entries set"/>
+        <scatter-gather doc:name="Scatter-Gather">
+            <processor-chain>
+                <foreach collection="#[flowVars.accounts]" doc:name="For Each account">
+                    <http:request config-ref="HTTP_Request_Configuration-hsbc" path="/accounts/{accountNumber}/transactions" method="GET" host="psd2-bank-#[payload.bank].cloudhub.io" port="80" doc:name="Retrieve transactions from Bank PSD2 API">
+                        <http:request-builder>
+                            <http:uri-param paramName="accountNumber" value="#[payload.accountNumber]"/>
+                        </http:request-builder>
+                    </http:request>
+                    <dw:transform-message doc:name="Transform Message">
+                        <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map ((payload01 , indexOfPayload01) -> {
+	datetime: payload01.timestamp,
+	description: payload01.description,
+	type: "transaction",
+	data: {
+		paymentMethod: payload01.type,
+		reference: payload01.ref,
+		accountNumber: payload01.accountNumber,
+		amount: payload01.amount
+	}
+})]]></dw:set-payload>
+                    </dw:transform-message>
+                    <expression-component doc:name="Expression"><![CDATA[flowVars.entries.addAll(payload)]]></expression-component>
+                </foreach>
+                <set-payload value="#[flowVars.entries]" doc:name="Set Payload"/>
+                <flow-ref name="subflow-normalize" doc:name="subflow-normalize"/>
+            </processor-chain>
+            <processor-chain>
+                <http:request config-ref="HTTP_Request_Configuration-ads" path="/ads" method="GET" doc:name="Retrieve adverts and recommendations"/>
+                <dw:transform-message doc:name="Transform Message">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload map ((payload01 , indexOfPayload01) -> {
+	datetime: payload01.datetime,
+	description: payload01.description,
+	type: payload01.type,
+	data: {
+		link: payload01.link
+	}
+})]]></dw:set-payload>
+                </dw:transform-message>
+                <flow-ref name="subflow-normalize" doc:name="subflow-normalize"/>
+            </processor-chain>
+            <processor-chain>
+            	<flow-ref name="subflow-analyseFutureTransactions" doc:name="subflow-analyseFutureTransactions"/>
+                <flow-ref name="subflow-normalize" doc:name="Flow Reference"/>
+               </processor-chain>
+        </scatter-gather>
+        <scripting:transformer doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[out = new ArrayList();
+out.addAll(payload[0]);
+out.addAll(payload[1]);
+out.addAll(payload[2]);
+return out;
+]]></scripting:script>
+        </scripting:transformer>
+        <flow-ref name="subflow-sortEntries" doc:name="subflow-sortEntries"/>
+        <json:object-to-json-transformer doc:name="Object to JSON"/>
+        <set-property propertyName="Content-type" value="application/json" doc:name="Property"/>
+        <logger level="INFO" doc:name="Logger"/>
     </flow>
+    <sub-flow name="subflow-getUserAccounts">
+        <scripting:transformer doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[return [ [bank: "hsbc", accountNumber: "87623476"], [bank: "lloyds", accountNumber: "36253527"] ];
+]]></scripting:script>
+        </scripting:transformer>
+    </sub-flow>
+    <sub-flow name="subflow-analyseFutureTransactions">
+        <parse-template location="future.json" doc:name="Parse Template"/>
+        <json:json-to-object-transformer returnClass="java.util.ArrayList" doc:name="JSON to Object"/>
+    </sub-flow>
+    <sub-flow name="subflow-sortEntries">
+        <scripting:transformer doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[for (i = 0; i < payload.size(); i++) {
+	if (! payload[i].type.equals("futureTransaction")) {
+	  	if (i < 5) payload[i].put("section", "today");
+		if (i >= 5) payload[i].put("section", "thisweek");
+	} else {
+		payload[i].put("section", "future");
+	}	
+}
+return payload;]]></scripting:script>
+        </scripting:transformer>
+    </sub-flow>
+    <sub-flow name="subflow-normalize">
+        <choice doc:name="Choice">
+            <when expression="#[flowVars.type.equals(&quot;short&quot;)]">
+                <set-payload value="#[(payload.size() &lt;= 3) ? (payload.subList(0, payload.size() - 1)) : (payload.subList(0, 2))]" doc:name="Set Payload"/>
+            </when>
+            <otherwise>
+                <logger level="INFO" doc:name="Logger"/>
+            </otherwise>
+        </choice>
+    </sub-flow>
     <apikit:mapping-exception-strategy name="api-apiKitGlobalExceptionMapping">
         <apikit:mapping statusCode="404">
             <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
